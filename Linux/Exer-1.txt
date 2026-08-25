@@ -1,0 +1,38 @@
+Scenario: The deployment folder maze
+
+You have inherited a project folder from a colleague who left. Build the structure below, then navigate it without ever using cd twice in a row.
+
+Set up from your home directory:
+
+project/
+|-- config/
+|   |-- dev.conf
+|   |-- prod.conf
+|-- logs/
+|   |-- app/
+|   |   |-- app.log
+|   |-- system/
+|       |-- sys.log
+|-- scripts/
+    |-- deploy.sh
+    |-- backup.sh
+
+Then complete each task, and for every one record the exact command you used:
+
+1. From your home directory, move into logs/app using a single absolute path. Print your location to confirm.
+
+2. From logs/app, move to config using a single relative path - no absolute path, and only one cd.
+
+3. From config, display the contents of app.log without leaving config. Use a relative path.
+
+4. From config, display the contents of app.log again, this time using an absolute path.
+
+5. From scripts, copy dev.conf into the logs/system folder using relative paths for both source and destination, in one command.
+
+6. Standing in logs/system, create an empty file called notes.txt inside scripts - without changing directory, and using a relative path.
+
+7. From anywhere in the tree, return to your home directory using three different methods.
+
+8. From logs/app, what does cd ../../.. land you in? Predict before running it, then check.
+
+Finally, answer in one line each: when would you deliberately choose an absolute path over a relative one in a script, and what breaks if you get that choice wrong?
