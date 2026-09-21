@@ -1,0 +1,190 @@
+name: 08 - Built-in Functions Demo
+
+run-name: >
+  Functions |
+  file=${{ inputs.filename || 'no-file' }} |
+  branch=${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      filename:
+        description: "File to inspect"
+        required: false
+        type: string
+        default: "report-2026.json"
+
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+
+      tags:
+        description: "Comma-separated tags"
+        required: false
+        type: string
+        default: "build,test,deploy"
+
+jobs:
+
+  # --------------------------------------------------
+  # 1. STRING FUNCTIONS
+  # --------------------------------------------------
+  string-functions:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Show contains()
+        run: |
+          echo "Tags: ${{ inputs.tags }}"
+          echo "Contains test? ${{ contains(inputs.tags, 'test') }}"
+
+      - name: Show startsWith()
+        run: |
+          echo "Filename: ${{ inputs.filename }}"
+          echo "Starts with report? ${{ startsWith(inputs.filename, 'report') }}"
+
+      - name: Show endsWith()
+        run: |
+          echo "Filename: ${{ inputs.filename }}"
+          echo "Ends with json? ${{ endsWith(inputs.filename, '.json') }}"
+
+      - name: Show format()
+        run: |
+          echo "${{ format('File {0} will be deployed to {1}', inputs.filename, inputs.environment) }}"
+
+
+  # --------------------------------------------------
+  # 2. CONDITIONAL FUNCTIONS
+  # --------------------------------------------------
+  condition-functions:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Always runs
+        run: echo "This step runs normally."
+
+      - name: success()
+        if: ${{ success() }}
+        run: echo "Previous steps succeeded."
+
+      - name: failure()
+        if: ${{ failure() }}
+        run: echo "A previous step failed."
+
+      - name: cancelled()
+        if: ${{ cancelled() }}
+        run: echo "Workflow was cancelled."
+
+      - name: always()
+        if: ${{ always() }}
+        run: echo "This step runs regardless of previous results."
+
+
+  # --------------------------------------------------
+  # 3. LOGICAL FUNCTIONS / OPERATORS
+  # --------------------------------------------------
+  logical-functions:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: AND condition
+        if: ${{ inputs.environment == 'prod' && contains(inputs.tags, 'deploy') }}
+        run: |
+          echo "Production deployment is allowed."
+
+      - name: OR condition
+        if: ${{ inputs.environment == 'dev' || inputs.environment == 'test' }}
+        run: |
+          echo "Development/test environment detected."
+
+      - name: NOT condition
+        if: ${{ !startsWith(inputs.filename, 'backup') }}
+        run: |
+          echo "This is not a backup file."
+
+
+  # --------------------------------------------------
+  # 4. COMBINING FUNCTIONS
+  # --------------------------------------------------
+  decision:
+    runs-on: ubuntu-latest
+
+    needs:
+      - string-functions
+      - condition-functions
+      - logical-functions
+
+    steps:
+
+      - name: Deployment decision
+        run: |
+          echo "================================="
+          echo "Deployment Decision"
+          echo "================================="
+
+          echo "File        : ${{ inputs.filename }}"
+          echo "Environment : ${{ inputs.environment }}"
+          echo "Tags        : ${{ inputs.tags }}"
+
+          echo "Has deploy tag?"
+          echo "${{ contains(inputs.tags, 'deploy') }}"
+
+          echo "Is production?"
+          echo "${{ inputs.environment == 'prod' }}"
+
+          echo "Starts with report?"
+          echo "${{ startsWith(inputs.filename, 'report') }}"
+
+      - name: Production deployment
+        if: >
+          ${{ inputs.environment == 'prod' &&
+              contains(inputs.tags, 'deploy') &&
+              startsWith(inputs.filename, 'report') }}
+        run: |
+          echo "🚀 Deploying report to PRODUCTION"
+
+      - name: Non-production deployment
+        if: >
+          ${{ inputs.environment != 'prod' &&
+              contains(inputs.tags, 'deploy') }}
+        run: |
+          echo "🧪 Deploying to ${{ inputs.environment }}"
+
+      - name: No deployment
+        if: >
+          ${{ !contains(inputs.tags, 'deploy') }}
+        run: |
+          echo "⏭️ Deployment skipped because deploy tag is missing."
+
+
+  # --------------------------------------------------
+  # 5. FAILURE + ALWAYS() DEMO
+  # --------------------------------------------------
+  error-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Simulate test
+        id: test
+        run: |
+          echo "Running tests..."
+          exit 1
+
+      - name: Runs only on failure
+        if: ${{ failure() }}
+        run: |
+          echo "❌ Test failed. Collecting failure information."
+
+      - name: Always runs
+        if: ${{ always() }}
+        run: |
+          echo "📦 Uploading logs / cleanup tasks."
