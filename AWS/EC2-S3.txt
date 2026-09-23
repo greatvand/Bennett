@@ -1,0 +1,41 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::utkarsh-ec2-files-2026"
+    },
+    {
+      "Sid": "ManageFiles",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::utkarsh-ec2-files-2026/*"
+    }
+  ]
+}
+
+aws --version
+
+echo "Hello from EC2" > test.txt
+
+aws s3 cp test.txt s3://utkarsh-ec2-files-2026/
+
+aws s3 ls s3://test-31313212312
+
+mkdir test && cd test
+
+Upload a file (helloworld.txt) in the bucket manually
+
+aws s3 cp s3://utkarsh-ec2-files-2026/helloworld.txt .
+
+ls
+
+aws s3 rm s3://utkarsh-ec2-files-2026/helloworld.txt
