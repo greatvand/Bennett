@@ -1,0 +1,50 @@
+name: Working with Artifacts
+
+on:
+  workflow_dispatch:
+
+env:
+  build-artifact-key: app-${{ github.sha }} #app-28374028fasdfads
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: react-app
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.x'
+      - name: Download cached dependencies
+        uses: actions/cache@v6
+        id: cache
+        with:
+          path: react-app/node_modules
+          key: deps-node-modules-${{ hashFiles('react-app/package-lock.json') }}
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Unit tests
+        run: npm run test
+      - name: Build code
+        run: npm run build
+      - name: Upload build files
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.build-artifact-key }}
+          path: react-app/build
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.build-artifact-key }}
+          path: build
+      - name: Show folder structure
+        run: ls -R
