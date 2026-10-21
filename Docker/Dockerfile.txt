@@ -1,0 +1,66 @@
+npm create vite@latest react-demo -- --template react
+cd react-demo
+npm install
+
+function App() {
+  const appEnv = import.meta.env.VITE_APP_ENV || "development";
+
+  return (
+    <div style={{ fontFamily: "sans-serif", textAlign: "center", marginTop: "4rem" }}>
+      <h1>Hello from a container</h1>
+      <p>Environment: <strong>{appEnv}</strong></p>
+    </div>
+  );
+}
+
+export default App;
+
+npm run dev
+
+create .dockerignore
+
+node_modules
+dist
+.git
+.env
+npm-debug.log
+Dockerfile
+
+Dockerfile
+
+# Base image
+FROM node:20-alpine
+
+# Working directory inside the image
+WORKDIR /app
+
+# Copy dependency files first so the install layer can be cached
+COPY package*.json ./
+
+# Build-time command: install dependencies
+RUN npm install
+
+# Copy the rest of the source code
+COPY . .
+
+# Environment variable, read by the React app
+ENV VITE_APP_ENV=production
+
+# Documentation only: the dev server listens on 5173
+EXPOSE 5173
+
+# ENTRYPOINT: the fixed program this container runs
+ENTRYPOINT ["npm", "run", "dev", "--"]
+
+# CMD: default arguments passed to the ENTRYPOINT
+CMD ["--host", "0.0.0.0", "--port", "5173"]
+
+docker build -t react-demo:v1 .
+docker run --rm -p 5173:5173 react-demo:v1
+
+docker run --rm -p 3000:3000 react-demo:v1 --host 0.0.0.0 --port 3000
+
+# Open a shell inside the container instead of starting the app
+docker run --rm -it --entrypoint bash react-demo:v1
+
+docker run --rm -p 5173:5173 -e VITE_APP_ENV=staging react-demo:v1
