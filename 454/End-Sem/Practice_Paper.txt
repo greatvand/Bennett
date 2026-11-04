@@ -1,0 +1,63 @@
+Practice Paper
+
+PART-A
+Q.1  First question will consist of 8 small questions covering entire syllabus out of which student has to attempt 6 questions.
+
+(a) A workflow step must set up Python 3.13 and the next step must run pytest -q. Differentiate the uses: keyword from the run: keyword in two points. 2
+
+(b) A college-fest website must be tested on every push to main or to any branch named release/**, but only when files under src/ change, and on every pull request that targets main. Write the on: section of the workflow file. 2
+
+(c) A QA team keeps raising the number of users on its booking site until errors start appearing, to find the breaking point. Name this type of performance testing and give one reason. 2
+
+(d) A student must run postgres:16 in the background as a container named db, with POSTGRES_PASSWORD set to devpass, and keep its data in the named volume pgdata mounted at /var/lib/postgresql/data. Write the docker run command. 2
+
+(e) On a cluster, a log collector must run exactly one Pod on every node, while a stateless web app needs three identical Pods. Name the Kubernetes workload object for each with a reason. 2
+
+(f) A manifest app.yaml must be applied in the namespace dev. Write the kubectl commands to apply it, to list only the Pods labelled app=web in dev, and to follow the logs of the Deployment web in dev. 2
+
+(g) A team tests its order service on its own with the payment service replaced by a mock, and later tests it together with a real database. Differentiate unit testing from integration testing in two points. 2
+
+(h) A team keeps a database in a container and also edits live code from a host folder during development. Differentiate a Docker volume from a bind mount in two points. 2
+2*6
+
+PART-B
+Attempt any two questions out of three. Each questions carrying 6 marks.
+
+Q.2  A college-fest portal is deployed by a GitHub Actions workflow to production using an API token.
+(i) State two precautions to follow when a workflow uses secrets and the GITHUB_TOKEN. (2)
+(ii) Write the job deploy on ubuntu-latest that uses the environment production, stops after 10 minutes, runs the step ./deploy.sh with the secret API_TOKEN passed through env, and belongs to the concurrency group deploy-production so that a running deployment is never cancelled. (3)
+(iii) A Cucumber test checks that a user logs in and then sees the dashboard. State whether this is business, technical or non-functional test automation. (1) 6
+
+Q.3  A team ships a Go service as a Docker image and finds that the image is hundreds of megabytes because the compiler is inside it.
+(i) Explain in two points how a multi-stage build solves this problem. (2)
+(ii) Write the Dockerfile: a stage named build from golang:1.25 with /src as the working folder, the code copied in and built with go build -o /out/app . ; and a final stage from gcr.io/distroless/static-debian12:nonroot that copies the binary from the build stage and starts it with ENTRYPOINT. (3)
+(iii) After a small bug fix on a stable build, the tester quickly checks only the fixed screen. Name this type of testing. (1) 6
+
+Q.4  A ticket-booking app runs its web Deployment on Kubernetes and expects traffic to jump suddenly when bookings open at noon.
+(i) Differentiate the Horizontal Pod Autoscaler from the Cluster Autoscaler in two points. (2)
+(ii) Write the HorizontalPodAutoscaler manifest for the Deployment web with a minimum of 2 and a maximum of 10 replicas, scaling at an average CPU utilization of 70 percent. (3)
+(iii) The team simulates a sudden jump and drop in traffic at noon to check the app. Name this type of performance testing. (1) 6
+
+PART-C
+Attempt both the questions. Each questions carrying 8 marks.
+
+Q.5  An e-commerce team keeps its Node.js app in GitHub. Every push to main must test on Node 22 and 24, build the app once, deploy it to staging, and then deploy the same build to production only after a reviewer approves.
+(i) Draw a block diagram of the jobs test, build, deploy-staging and deploy-production, and name the keyword that makes one job wait for another and the feature that makes production wait for approval. (3)
+(ii) Write the jobs: section for build (needs test, uploads the folder dist/ as an artifact named dist) and deploy-production (needs build, uses the environment production, downloads the artifact dist and runs ./scripts/deploy.sh). The test and staging jobs may be left out. (3)
+(iii) State two reasons why the team builds once and deploys that exact artifact instead of rebuilding in every job. (2) 8
+OR
+A hostel-mess app has an api and a Postgres database run with Docker Compose. The api sometimes crashes at start-up because Postgres is not yet ready.
+(i) Explain why depends_on alone does not solve the problem and name the condition that does. (3)
+(ii) Write the compose.yaml: db (postgres:16, POSTGRES_PASSWORD=devpass, healthcheck using pg_isready -U postgres every 5s with 10 retries) and api (build ./api, waits until db is healthy). (3)
+(iii) The team runs unit tests, API tests and a few browser tests on this app. Arrange these in the test pyramid from base to top and state which one there should be the most of. (2) 8
+
+Q.6  A bank's app needs a three-replica database on Kubernetes, and a developer proposes running it as a Deployment.
+(i) State three reasons why a StatefulSet suits the database better than a Deployment. (3)
+(ii) Write the StatefulSet manifest db (headless Service name db, 3 replicas, label app: db, image postgres:16) with a volumeClaimTemplate named data that requests 5Gi with ReadWriteOnce access. (3)
+(iii) A tester re-runs a failed test to confirm its fix and then runs all the other tests to confirm that nothing else broke. Differentiate retesting from regression testing in two points. (2) 8
+OR
+A bookstore's api Deployment must move from version 1.0 to 1.1 with no downtime, and be undone quickly if version 1.1 misbehaves.
+(i) Explain how a rolling update with maxSurge 1 and maxUnavailable 0 achieves zero downtime, and differentiate a blue-green rollout from a canary rollout in one point. (3)
+(ii) Write the strategy section of the Deployment and the kubectl commands to update the image to ghcr.io/acme/api:1.1, watch the rollout and roll back to the previous version. (3)
+(iii) The team runs its tests on rented cloud browsers and devices. State two points to watch out for when using cloud testing. (2) 8
+**********
